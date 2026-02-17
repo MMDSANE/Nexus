@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>خطا: اتاق چت پیدا نشد</title>
+  <style>
+    /* تم مدرن تیره */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #111;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .error-container {
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      border: 1px solid #333;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #ff6b6b; /* رنگ قرمز برای خطا */
+      font-weight: 900;
+    }
+    p {
+      color: #ccc;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+    .room-code {
+        display: inline-block;
+        background: #2a2a2a;
+        color: #667eea;
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .btn {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="error-container">
+    <h1>توجه!</h1>
+    <p>شما از چت خارج شدید.</p>
+
+    {% if room_code %}
+        <p>کد روم شما:</p>
+        <span class="room-code">{{ room_code }}</span>
+    {% else %}
+        <p>کد روم مشخص نشده است.</p>
+    {% endif %}
+
+    <a href="/" class="btn" style="margin-top: 30px;">بازگشت به صفحه اصلی</a>
+  </div>
+
+</body>
+</html>

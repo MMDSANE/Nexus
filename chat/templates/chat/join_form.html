@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ورود به چت روم | Nexus</title>
+  <style>
+    /* کدهای CSS را برای حفظ ظاهر مدرن تکرار می‌کنیم */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #111;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px; /* کوچک‌تر برای فرم‌ها */
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: #fff;
+    }
+    p {
+      font-size: 1.1rem;
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 25px;
+        text-align: right;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #ccc;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: white;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus, input[type="number"]:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    .btn {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+      width: 100%;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    }
+    .error {
+        color: #ff6b6b;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>به Nexus خوش آمدید</h1>
+    <p>کد شش رقمی روم را وارد کنید تا به گفتگو بپیوندید.</p>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'chat:join_room' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="room_code">کد روم:</label>
+            <!-- مقداردهی اولیه برای زمانی که کاربر کد را اشتباه وارد کرده است -->
+            <input type="text" id="room_code" name="room_code" value="{{ room_code|default:'' }}" maxlength="6" required>
+        </div>
+
+        <button type="submit" class="btn">پیوستن به روم</button>
+
+        <!-- لینک بازگشت به صفحه اصلی -->
+        <p style="margin-top: 20px;"><a href="{% url 'landing:landing_view' %}" style="color: #aaa; text-decoration: underline;">بازگشت به صفحه اصلی</a></p>
+    </form>
+
+  </div>
+
+</body>
+</html>

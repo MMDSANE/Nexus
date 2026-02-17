@@ -1,0 +1,450 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>چت روم {{ room_code }} | Nexus</title>
+    <style>
+        /* --- تنظیمات پایه و مدیریت Flexbox صفحه --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #111;
+            color: #f0f0f0;
+            min-height: 100vh; /* ارتفاع کامل صفحه */
+            display: flex; /* فعال‌سازی Flexbox برای مدیریت عمودی */
+            justify-content: center;
+            overflow-x: hidden;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+            display: flex; /* برای کنترل ترتیب و ارتفاع آیتم‌ها در صفحه */
+            flex-direction: column;
+            min-height: 100vh; /* Container هم ارتفاع کامل صفحه بگیرد */
+        }
+
+        /* تنظیم خاص برای حالتی که فرم مهمان نمایش داده می‌شود */
+        .guest-login-content {
+            display: block !important;
+            min-height: auto;
+            margin: auto; /* برای وسط قرار گرفتن در حالت مهمان */
+        }
+
+        h1, h2 {
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+        }
+
+        p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        /* ... سایر استایل‌های فرم و دکمه ... */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* بهبود یافته: استایل Status Box و Member List */
+        .status-and-members-wrapper {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-box {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .member-list {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            background: #282828;
+            max-height: 100px;
+            overflow-y: auto;
+            text-align: right;
+        }
+
+        .member-list li {
+            list-style-type: none;
+            padding: 4px 0;
+            border-bottom: 1px dotted #444;
+            font-size: 0.9rem;
+        }
+
+        .member-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* --- بهبود ظاهر چت (مدیریت فضای عمودی) --- */
+
+        .chat-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* **این باعث می‌شود این بخش تمام فضای خالی باقی‌مانده را اشغال کند** */
+            min-height: 0; /* ضروری برای فعال شدن flex-grow در Safari/iOS */
+            margin-bottom: 15px;
+        }
+
+        #chat-history {
+            /* اسکرول مستقل روی این بخش اعمال می‌شود */
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-history .message-container {
+            /* اجازه می‌دهد که محتوای پیام‌ها به پایین رشد کند و اسکرول فعال شود */
+            flex-grow: 1;
+        }
+
+        #chat-history h3 {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+
+        /* ... استایل‌های پیام‌ها (بدون تغییر) ... */
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 5px;
+        }
+
+        .message-item {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-bubble-wrapper {
+            display: flex;
+            max-width: 85%;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            word-wrap: break-word;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        /* پیام‌های کاربر فعلی (چپ‌چین) */
+        .message-self .message-bubble {
+            background: #3c598e;
+            color: white;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-self {
+            justify-content: flex-start;
+        }
+
+        .message-self .message-meta {
+            text-align: right;
+        }
+
+        /* پیام‌های دیگران (راست‌چین) */
+        .message-other .message-bubble {
+            background: #252525;
+            color: #f0f0f0;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-other {
+            justify-content: flex-end;
+        }
+
+        .message-other .message-meta {
+            text-align: left;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            color: #a2d4ba;
+            margin-bottom: 3px;
+            font-size: 0.9rem;
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.75rem;
+        }
+
+        .message-time {
+            color: #999;
+        }
+
+
+        /* تنظیمات فرم ارسال پیام (ثابت در پایین - باید پایین صفحه ثابت باشد) */
+        #message-form-container {
+            padding: 10px 0;
+            background: #111;
+            border-top: 1px solid #222;
+            flex-shrink: 0; /* اطمینان از اینکه فرم کوچک نمی‌شود */
+        }
+
+        #message-form-container form {
+            display: flex;
+            gap: 10px;
+        }
+
+        #message-form-container textarea {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 20px;
+            resize: none;
+            min-height: 45px;
+            max-height: 100px;
+        }
+
+        #message-form-container .btn {
+            width: auto;
+            padding: 12px 20px;
+            margin-top: 0;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        /* دکمه خروج (موقعیت بالا) */
+        .exit-form-wrapper {
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .exit-form-wrapper .btn {
+            width: 50%;
+            max-width: 300px;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    {% if get_username %}
+        {# --- فرم تنظیم نام کاربری (Guest Login) --- #}
+        <div class="guest-login-content">
+            <h2>به روم کد: {{ room_code }} خوش آمدید</h2>
+            <p>لطفاً نام موقت خود را برای ورود به گفتگو وارد کنید.</p>
+
+            <form method="post" action="{% url 'chat:chat_room' room_code=room_code %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">نام موقت شما:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <button type="submit" class="btn">شروع تعامل</button>
+
+            </form>
+
+            {% if error %}
+                <div class="error">{{ error }}</div>{% endif %}
+        </div>
+
+    {% else %}
+        {# --- محیط اصلی چت (ساختار عمودی ثابت) --- #}
+
+        {# ۱. سربرگ و اطلاعات ثابت #}
+        <h1>چت روم: {{ room_code }}</h1>
+
+        {% if is_logged_in %}
+            <p style="font-size: 0.9rem;">شما با نام کاربری: <strong>{{ request.user.username }}</strong> وارد شده‌اید.
+            </p>
+        {% else %}
+            <p style="font-size: 0.9rem;">شما با نام موقت: <strong>{{ current_username }}</strong> وارد شده‌اید.</p>
+        {% endif %}
+
+        <div class="status-and-members-wrapper">
+            <div class="status-box">
+                <strong>اعضای فعال:</strong> {{ room_members_count }} نفر
+                <div class="member-list">
+                    <p style="color: #999; margin-bottom: 5px;">لیست مهمانان:</p>
+                    {% if active_guests_list %}
+                        {% for guest in active_guests_list %}
+                            <li>{{ guest }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li>مهمان فعال دیگری در این سشن نیست.</li>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# ۳. بخش پیام‌ها (اسکرول مستقل) #}
+        <!-- --- بهبود ظاهر چت (مدیریت فضای عمودی) --- -->
+        <div class="chat-content-wrapper">
+            <div id="chat-history"
+                 style="flex-grow: 1; min-height: 0; height: 100%; overflow-y: auto; border: 1px solid #333; padding: 15px; background: #1a1a1a; border-radius: 12px; margin-bottom: 15px;">
+                <div class="message-container">
+                    {% for msg in messages %}
+                        {% if is_logged_in and msg.sender == request.user.username or not is_logged_in and msg.sender == current_username %}
+                            <div class="message-item message-self">
+                                <div class="message-bubble-wrapper">
+                                    <div class="message-bubble">
+                                        {{ msg.content }}
+                                    </div>
+                                    <div class="message-meta">
+                                        <span class="message-time">{{ msg.timestamp }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="message-item message-other">
+                                <div class="message-bubble-wrapper">
+                                    <div class="message-bubble">
+                                        <span class="message-sender">{{ msg.sender }}:</span>
+                                        {{ msg.content }}
+                                    </div>
+                                    <div class="message-meta">
+                                        <span class="message-time">{{ msg.timestamp }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <p style="color: #777; text-align: center; margin-top: auto;">هنوز پیامی ارسال نشده است.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        {# ۴. فرم ارسال پیام (ثابت در پایین) #}
+        <div id="message-form-container">
+            <form method="POST" action="{% url 'chat:send_message' room_code=room_code %}">
+                {% csrf_token %}
+                <textarea name="content" rows="1" placeholder="پیام خود را وارد کنید..." required></textarea>
+                <button type="submit" class="btn">ارسال</button>
+            </form>
+        </div>
+
+    {% endif %}
+
+    {# ۲. دکمه خروج #}
+    <div class="exit-form-wrapper">
+        <form method="POST" action="{% url 'chat:leave_chat' room_code=room_code %}" style="margin-top: 10px;">
+            {% csrf_token %}
+            <button type="submit" class="btn"
+                    style="background: #764ba2; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);">خروج از روم
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const historyDiv = document.getElementById('chat-history');
+        if (historyDiv) {
+            // اسکرول به پایین پس از بارگذاری محتوا (برای مشاهده آخرین پیام)
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+    });
+</script>
+
+</body>
+</html>

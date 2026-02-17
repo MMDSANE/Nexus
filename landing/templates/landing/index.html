@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nexus | شبکه اجتماعی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #111;
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #fff;
+            opacity: 0.95;
+        }
+
+        p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #ccc;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+            padding: 0 20px;
+        }
+
+        .feature {
+            background: #234;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .feature:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .feature p {
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            color: #666;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+
+            p {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                padding: 14px 28px;
+            }
+
+            .feature {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero">
+        <h1>Nexus</h1>
+        <p>شبکه اجتماعی آینده. جایی که لحظات و ایده‌ها می‌توانند حرکت کنند.</p>
+
+        <!-- ایجاد چت روم -->
+        <form method="POST" action="{% url 'chat:create_room' %}" style="margin-top: 20px;">
+            {% csrf_token %}
+            <button type="submit" class="btn">ایجاد چت روم جدید</button>
+        </form>
+
+        <!-- ورود به چت روم موجود -->
+{#        <a href="{% url 'chat:join_room' %}" class="btn" style="margin-top: 15px; display: inline-block;">ورود به چت#}
+{#            روم</a>#}
+        <form method="POST" action="{% url 'chat:join_room' %}" style="margin-top: 20px;">
+            {% csrf_token %}
+            <button type="submit" class="btn">ورود به چت روم</button>
+        </form>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <h3>ارتباط سریع</h3>
+            <p>با یک کلیک، لحظات خود را به اشتراک بگذارید. سریع، بدون دستکاری، بدون تأخیر.</p>
+        </div>
+        <div class="feature">
+            <h3>ایمنی مطلق</h3>
+            <p>داده‌های شما محفوظ است. هیچ‌کس جز شما، به محتوای شما دسترسی ندارد.</p>
+        </div>
+        <div class="feature">
+            <h3>سازگاری کامل</h3>
+            <p>در هر دستگاهی، در هر زمانی، با هر سرعتی. بدون اشکال، بدون تأخیر.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 Nexus. همه حقوق محفوظ است.
+    </div>
+</div>
+
+</body>
+</html>
